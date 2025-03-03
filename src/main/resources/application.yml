@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: expenify
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 12345
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
