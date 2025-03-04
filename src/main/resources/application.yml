@@ -2,8 +2,8 @@ spring:
   application:
     name: expenify
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 12345
 
