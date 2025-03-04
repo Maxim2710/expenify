@@ -1,17 +1,23 @@
 package com.expenify.service
 
+import com.expenify.dto.ExpenseFilterDto
 import com.expenify.dto.ExpenseRequestDto
 import com.expenify.dto.ExpenseResponseDto
 import com.expenify.model.Expense
+import com.expenify.model.enums.ExpenseCategory
 import com.expenify.repository.ExpenseRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
 class ExpenseService(
     private val expenseRepository: ExpenseRepository
 ) {
-    suspend fun createExpense(expenseRequest: ExpenseRequestDto): ExpenseResponseDto? {
+    suspend fun createExpense(expenseRequest: ExpenseRequestDto): ExpenseResponseDto {
         val expense = Expense(
             amount = expenseRequest.amount,
             description = expenseRequest.description,
@@ -24,6 +30,16 @@ class ExpenseService(
         val savedExpense = expenseRepository.save(expense)
 
         return savedExpense.toResponse()
+    }
+
+    suspend fun getExpenses(expenseFilter: ExpenseFilterDto): Flow<ExpenseResponseDto> {
+        return expenseRepository.findAll()
+            .filter { expense ->
+                (expenseFilter.startDate == null || !expense.date.isBefore(expenseFilter.startDate)) &&
+                (expenseFilter.endDate == null || !expense.date.isAfter(expenseFilter.endDate)) &&
+                (expenseFilter.category == null || expense.category == expenseFilter.category)
+            }
+            .map { it.toResponse() }
     }
 
     private fun Expense.toResponse() = ExpenseResponseDto(
