@@ -3,12 +3,14 @@ package com.expenify.service
 import com.expenify.dto.ExpenseFilterDto
 import com.expenify.dto.ExpenseRequestDto
 import com.expenify.dto.ExpenseResponseDto
+import com.expenify.exception.ExpenseNotFoundException
 import com.expenify.model.Expense
 import com.expenify.model.enums.ExpenseCategory
 import com.expenify.repository.ExpenseRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,6 +42,13 @@ class ExpenseService(
                 (expenseFilter.category == null || expense.category == expenseFilter.category)
             }
             .map { it.toResponse() }
+    }
+
+    suspend fun getExpenseById(id: Long): ExpenseResponseDto {
+        val expense = expenseRepository.findById(id)
+            ?: throw ExpenseNotFoundException("Expense not found with id: $id")
+
+        return expense.toResponse()
     }
 
     private fun Expense.toResponse() = ExpenseResponseDto(
