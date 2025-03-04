@@ -1,12 +1,15 @@
 package com.expenify.controller
 
+import com.expenify.dto.ExpenseFilterDto
 import com.expenify.dto.ExpenseRequestDto
 import com.expenify.dto.ExpenseResponseDto
 import com.expenify.service.ExpenseService
 import jakarta.validation.Valid
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,5 +28,10 @@ class ExpenseController(
     ): ResponseEntity<ExpenseResponseDto> {
         val response = expenseService.createExpense(expenseRequest)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    @GetMapping
+    suspend fun getExpenses(expenseFilter: ExpenseFilterDto): Flow<ExpenseResponseDto> {
+        return expenseService.getExpenses(expenseFilter)
     }
 }
