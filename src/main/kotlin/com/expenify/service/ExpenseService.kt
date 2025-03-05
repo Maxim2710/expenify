@@ -51,6 +51,23 @@ class ExpenseService(
         return expense.toResponse()
     }
 
+    suspend fun updateExpense(id: Long, expenseRequest: ExpenseRequestDto): ExpenseResponseDto {
+        val expense = expenseRepository.findById(id)
+            ?: throw ExpenseNotFoundException("Expense not found with id: $id")
+
+        val updatedExpense = expense.copy(
+            amount = expenseRequest.amount,
+            description = expenseRequest.description,
+            date = expenseRequest.date,
+            category = expenseRequest.category,
+            updatedAt = LocalDateTime.now()
+        )
+
+        val savedExpense = expenseRepository.save(updatedExpense)
+
+        return savedExpense.toResponse()
+    }
+
     private fun Expense.toResponse() = ExpenseResponseDto(
         id = this.id,
         amount = this.amount,
