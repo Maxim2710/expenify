@@ -68,6 +68,13 @@ class ExpenseService(
         return savedExpense.toResponse()
     }
 
+    suspend fun deleteExpense(id: Long) {
+        val expense = expenseRepository.findById(id)
+            ?: throw ExpenseNotFoundException("Expense not found with id: $id")
+
+        expenseRepository.delete(expense)
+    }
+
     private fun Expense.toResponse() = ExpenseResponseDto(
         id = this.id,
         amount = this.amount,
