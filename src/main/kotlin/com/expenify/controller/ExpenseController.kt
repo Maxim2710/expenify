@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -47,6 +48,20 @@ class ExpenseController(
         } catch (e: ExpenseNotFoundException) {
             ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("error" to e.message))
+        }
+    }
+
+    @PutMapping("{id}")
+    suspend fun updateExpense(
+        @PathVariable id: Long,
+        @Valid @RequestBody expenseRequest: ExpenseRequestDto
+    ): ResponseEntity<Any> {
+        return try {
+            val response = expenseService.updateExpense(id, expenseRequest)
+            ResponseEntity.ok(response)
+        } catch (e: ExpenseNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("error" to  e.message))
         }
     }
 }
